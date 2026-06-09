@@ -1,0 +1,58 @@
+# MediaPipe graph that performs hands tracking on desktop with TensorFlow
+# Lite on CPU.
+# Placeholders {NUM_HANDS} and {MODEL_COMPLEXITY} are replaced at runtime
+# from hand_tracking_config.ini settings.
+
+# CPU image. (ImageFrame)
+input_stream: "input_video"
+
+# CPU image. (ImageFrame)
+output_stream: "output_video"
+
+# Generates side packet containing max number of hands to detect/track.
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:num_hands"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+      packet { int_value: {NUM_HANDS} }
+    }
+  }
+}
+
+# Generates side packet containing model complexity (0=lite, 1=full).
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:model_complexity"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+      packet { int_value: {MODEL_COMPLEXITY} }
+    }
+  }
+}
+
+# Detects/tracks hand landmarks.
+node {
+  calculator: "HandLandmarkTrackingCpu"
+  input_stream: "IMAGE:input_video"
+  input_side_packet: "NUM_HANDS:num_hands"
+  input_side_packet: "MODEL_COMPLEXITY:model_complexity"
+  output_stream: "LANDMARKS:landmarks"
+  output_stream: "HANDEDNESS:handedness"
+  output_stream: "PALM_DETECTIONS:multi_palm_detections"
+  output_stream: "HAND_ROIS_FROM_LANDMARKS:multi_hand_rects"
+  output_stream: "HAND_ROIS_FROM_PALM_DETECTIONS:multi_palm_rects"
+}
+
+# Subgraph that renders annotations and overlays them on top of the input
+# images (see hand_renderer_cpu.pbtxt).
+node {
+  calculator: "HandRendererSubgraph"
+  input_stream: "IMAGE:input_video"
+  input_stream: "DETECTIONS:multi_palm_detections"
+  input_stream: "LANDMARKS:landmarks"
+  input_stream: "HANDEDNESS:handedness"
+  input_stream: "NORM_RECTS:0:multi_palm_rects"
+  input_stream: "NORM_RECTS:1:multi_hand_rects"
+  output_stream: "IMAGE:output_video"
+}
