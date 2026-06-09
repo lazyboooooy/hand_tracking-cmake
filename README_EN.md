@@ -58,29 +58,39 @@ Camera Frame (OpenCV)
 
 ### 21 Hand Landmarks
 
+Right hand, back view (fingers pointing up, ● numbers = landmark indices):
+
 ```
-                   Fingertips
-                 ╭───●───╮
-                 │ 8 12 16 │  ← Index/Middle/Ring/Pinky tips
-                 │ 7 11 15 │  ← PIP joints
-                 │ 6 10 14 │  ← DIP joints
-                 │       20│  ← Pinky MCP
-     Thumb → ●4  ●5 ●9 ●13 ●17
-             ●3  ●2       ●18  ← Palm
-                ●1        ●19  ← Palm base
-                ●0             ← Wrist
+                        ●8      ●12     ●16     ●20     ← Tips
+                        │        │       │       │
+                        ●7      ●11     ●15     ●19     ← DIP (distal interphalangeal)
+                        │        │       │       │
+      ●4 (Thumb tip)    ●6      ●10     ●14     ●18     ← PIP (proximal interphalangeal)
+       │                │        │       │       │
+      ●3 (Thumb IP)     ●5      ●9      ●13     ●17     ← MCP (metacarpophalangeal)
+       │                │╲       │╲      │╲      │
+      ●2 (Thumb MCP)    │ ╲      │ ╲     │ ╲     │
+        ╲               │  ╲     │  ╲    │  ╲    │
+         ●1 (Thumb CMC)─┘   ╲    │   ╲   │   ╲   │
+           ╲                  ╲   │    ╲  │    ╲  │
+            ╲                  ╲  │     ╲ │     ╲ │
+             ╲                  ╲ │      ╲│      ╲│
+              └──────●0──────────┸┸───────┸┘───────┘
+                     Wrist
+
+        Thumb          Index   Middle  Ring   Pinky
 ```
 
-| Region | Landmark Indices | Count | Description |
-|--------|-----------------|-------|-------------|
-| Wrist | 0 | 1 | Wrist center |
-| Thumb | 1–4 | 4 | CMC → MCP → IP → Tip |
-| Index finger | 5–8 | 4 | MCP → PIP → DIP → Tip |
-| Middle finger | 9–12 | 4 | MCP → PIP → DIP → Tip |
-| Ring finger | 13–16 | 4 | MCP → PIP → DIP → Tip |
-| Pinky | 17–20 | 4 | MCP → PIP → DIP → Tip |
+| Finger | Landmark Indices | Joint chain (palm → tip) |
+|--------|-----------------|--------------------------|
+| Wrist | **0** | Wrist center |
+| Thumb | **1 → 2 → 3 → 4** | CMC (carpometacarpal) → MCP → IP (interphalangeal) → Tip |
+| Index | **5 → 6 → 7 → 8** | MCP → PIP → DIP → Tip |
+| Middle | **9 → 10 → 11 → 12** | MCP → PIP → DIP → Tip |
+| Ring | **13 → 14 → 15 → 16** | MCP → PIP → DIP → Tip |
+| Pinky | **17 → 18 → 19 → 20** | MCP → PIP → DIP → Tip |
 
-> Each landmark outputs (x, y, z) 3D coordinates. The z-coordinate represents depth relative to the wrist, enabling gesture recognition and 3D hand modeling.
+> **Thumb note**: The thumb has only two phalanges (proximal and distal), resulting in a single interphalangeal (IP) joint, unlike the other four fingers which have both PIP and DIP joints. Each landmark outputs (x, y, z) 3D coordinates — the z-coordinate represents depth relative to the wrist, enabling gesture recognition and 3D hand modeling.
 
 ---
 
